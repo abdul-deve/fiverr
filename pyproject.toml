@@ -1,0 +1,13 @@
+[project]
+name = "fiverr"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "django>=5.2.8",
+    "django-phone-verify>=3.2.0",
+    "django-phonenumber-field>=8.3.0",
+    "djangorestframework>=3.16.1",
+    "phonenumbers>=9.0.18",
+]
