@@ -2,6 +2,9 @@ from datetime import  timedelta
 from django.db.models import F
 import pyotp
 from django.utils import timezone
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 from.models import Device
 
@@ -14,16 +17,22 @@ class OTPService:
     def generate_secret_key() -> str:
         """Generate a new 16-character base32 secret key"""
         return pyotp.random_base32()
+    def get_device(self,user:User):
+        device, created = Device.objects.get_or_create(
+            user=user,
+            defaults={"secret_key": self.generate_secret_key()}
+        )
+        return device
 
-    @staticmethod
-    def generate_totp(device: Device) -> str:
+    def generate_otp(self,user:User) -> str:
         """Return current OTP for a device"""
+        device = self.get_device(user)
         return pyotp.TOTP(device.secret_key, interval=OTPService.OTP_INTERVAL).now()
 
-    @staticmethod
-    def verify_otp(device: Device, otp) -> bool:
+    def verify_otp(self,user: User, otp) -> bool:
         """Verify OTP, handle attempts, cooldown, and secret rotation"""
         # Check if device is blocked
+        device = self.get_device(user)
         if device.attempts >= device.max_attempts:
             if device.last_failed_attempt:
                 block_until = device.last_failed_attempt + timedelta(seconds=OTPService.BLOCK_TIME)

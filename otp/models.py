@@ -10,7 +10,6 @@ class Device(TimeStamp):
     max_attempts: int
     secret_key: str
     last_failed_attempt: "datetime | None"
-
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="user_device")
     attempts = models.PositiveSmallIntegerField(default=0)
     max_attempts = models.PositiveSmallIntegerField(default=3)
